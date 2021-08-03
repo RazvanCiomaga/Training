@@ -1,0 +1,17 @@
+*{
+    margin: 0;
+}
+.img{
+    width: 100px;
+    height: 100px;
+    float: left;
+}
+h1{
+    margin-bottom: 10px;
+}
+
+.formular {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
