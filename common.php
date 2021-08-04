@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Starting a working session
+ */
+session_start();
+
 require_once "config.php";
 
 /**
@@ -9,11 +14,6 @@ $connectDb = mysqli_connect(serverName,username,password,dbName );
 if (!$connectDb) {
     die("Connection failed: " . mysqli_connect_error());
 }
-
-/**
- * Starting a working session
- */
-session_start();
 
 /**
  * Function to translate a label

@@ -2,9 +2,9 @@
 
 include "common.php";
 include "header.php";
-include "footer.php";
 
 ?>
+
 <body>
     <h1><?= sanitize(translate("Products Page")) ?></h1>
     <div class="container">
@@ -32,12 +32,19 @@ include "footer.php";
                     <td><h2><?= sanitize($row["title"]) ?></h2></td>
                     <td><p><?= sanitize($row["description"]) ?></p></td>
                     <td><h4><?= sanitize($row["price"]) ?></h4></td>
-                    <td><a href="index.php?id=<?= sanitize($row["id"]) ?>"><?= sanitize(translate("Add to Cart")) ?></a></td>
+                    <td><a href="addtocart.php?id=<?= sanitize($row["id"]) ?>"><?= sanitize(translate("Add to Cart")) ?></a></td>
                 </tr>
             <?php endwhile; ?>
             </tbody>
         </table>
     </div>
-
 </body>
+
+<?php
+
+include "footer.php";
+
+?>
+
+
 
