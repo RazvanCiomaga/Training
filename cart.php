@@ -14,23 +14,18 @@ include "header.php";
             <th><?= sanitize(translate("Remove")) ?></th>
         </thead>
         <tbody>
-            <?php
-                $items = $_SESSION['cart'];
-                $cartItems = explode(",", $items);
-            ?>
-            <?php foreach ($cartItems as $key => $id) : ?>
-            <?php
-                $select = "SELECT * FROM products WHERE id=$id";
-                $result = mysqli_query($connectDb,$select);
-                $item = mysqli_fetch_array($result);
-            ?>
+        <?php
+            $select ="SELECT * FROM products WHERE id IN (".($_SESSION['cart'] ? implode(",", $_SESSION['cart']) : '0').")";
+            $result = mysqli_query($connectDb, $select);
+        ?>
+        <?php while ($item= mysqli_fetch_array($result)) : ?>
             <tr>
                 <td><p><?= sanitize($item["id"]) ?></p></td>
                 <td><p><?= sanitize($item["title"]) ?></p></td>
                 <td><p><?= sanitize($item["price"]) ?></p></td>
-                <td><a href="rmvfromcart.php?remove=<?= sanitize($key) ?>"><?= sanitize(translate('Remove item')) ?></a></td>
+                <td><a href="rmvfromcart.php?remove=<?= sanitize($item['id']) ?>"><?= sanitize(translate('Remove item')) ?></a></td>
             </tr>
-            <?php endforeach; ?>
+        <?php endwhile; ?>
         </tbody>
 
     </table>
