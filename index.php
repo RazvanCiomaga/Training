@@ -1,47 +1,43 @@
 <?php
 
-session_start();
-require_once "connectDatabase.php";
-?>
+include "common.php";
+include "header.php";
+include "footer.php";
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="styles.css" />
-    <title>Products Page</title>
-</head>
+?>
 <body>
-    <h1>Products Page</h1>
+    <h1><?= sanitize(translate("Products Page")) ?></h1>
     <div class="container">
 
         <?php
-        $select ="SELECT title,image,description,price FROM products ORDER BY id ASC";
-        $result = mysqli_query($connectDb,$select);
-        while($row = mysqli_fetch_array($result)){
+            $select ="SELECT * FROM products ORDER BY id ASC";
+            $result = mysqli_query($connectDb, $select);
         ?>
-        <div class="product-container">
-            <form method="post" class="formular">
-                <div>
-                    <img src="<?php echo $row["image"]; ?>" class="img" />
-                    <div>
-                        <h2><?php echo $row["title"] ?></h2>
-                        <p><?php echo $row["description"]; ?></p>
-                        <h4><?php echo $row["price"]; ?></h4>
-                    </div>
-
-                    <input type="submit" name="add_to_cart" value="Add" />
-                </div>
-            </form>
-        </div>
-        <?php
-            }
-
-        ?>
-
+        <table border="1">
+            <thead>
+                <tr>
+                    <th><?= sanitize(translate("ID")) ?></th>
+                    <th><?= sanitize(translate("Image")) ?></th>
+                    <th><?= sanitize(translate("Title")) ?></th>
+                    <th><?= sanitize(translate("Description")) ?></th>
+                    <th><?= sanitize(translate("Price")) ?></th>
+                    <th><?= sanitize(translate("Add to cart")) ?></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php while ($row = mysqli_fetch_array($result)) : ?>
+                <tr>
+                    <td><p><?= sanitize($row["id"]) ?></p></td>
+                    <td><img src="<?= sanitize($row["image"]); ?>" class="img" /></td>
+                    <td><h2><?= sanitize($row["title"]) ?></h2></td>
+                    <td><p><?= sanitize($row["description"]) ?></p></td>
+                    <td><h4><?= sanitize($row["price"]) ?></h4></td>
+                    <td><a href="index.php?id=<?= sanitize($row["id"]) ?>"><?= sanitize(translate("Add to Cart")) ?></a></td>
+                </tr>
+            <?php endwhile; ?>
+            </tbody>
+        </table>
     </div>
 
 </body>
-</html>
+
