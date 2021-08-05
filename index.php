@@ -4,6 +4,7 @@ include "common.php";
 
 if (isset($_SESSION['cart']) && isset($_GET['id'])) {
     $_SESSION['cart'][] = $_GET['id'];
+    header("location: index.php");
 }
 
 include "header.php";
@@ -17,7 +18,11 @@ include "header.php";
             $select ="SELECT * FROM products WHERE id NOT IN ($param)";
             $stmt = mysqli_prepare($connectDb, $select);
             $types = str_repeat('s', count($_SESSION['cart']));
-            mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
+            if (!empty($_SESSION['cart'])) {
+                mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
+            } else {
+                echo 'Nothing to add for now';
+            }
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
         ?>
@@ -48,11 +53,7 @@ include "header.php";
     </div>
 </body>
 
-<?php
-
-include "footer.php";
-
-?>
+<?php include "footer.php" ?>
 
 
 

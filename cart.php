@@ -8,10 +8,12 @@ include "header.php";
     <h1><?= sanitize(translate("Products in cart")) ?></h1>
     <table border="1">
         <thead>
+        <tr>
             <th><?= sanitize(translate("ID")) ?></th>
             <th><?= sanitize(translate("Title")) ?></th>
             <th><?= sanitize(translate("Price")) ?></th>
             <th><?= sanitize(translate("Remove")) ?></th>
+        </tr>
         </thead>
         <tbody>
         <?php
@@ -19,14 +21,18 @@ include "header.php";
             $select ="SELECT * FROM products WHERE id IN ($param)";
             $stmt = mysqli_prepare($connectDb, $select);
             $types = str_repeat('s', count($_SESSION['cart']));
-            mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
+            if (!empty($_SESSION['cart'])) {
+                mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
+            } else {
+                echo 'Cart is empty';
+            }
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
         ?>
-        <?php while ($item= mysqli_fetch_array($result)) : ?>
+        <?php while ($item = mysqli_fetch_array($result)) : ?>
             <tr>
                 <td><p><?= sanitize($item["id"]) ?></p></td>
-                <td><img src="<?= sanitize($item["image"]); ?>" class="img" /></td>
+                <td><img src="<?= sanitize($item["image"]); ?>" class="img" alt=""/></td>
                 <td><p><?= sanitize($item["title"]) ?></p></td>
                 <td><p><?= sanitize($item["price"]) ?></p></td>
                 <td><a href="rmvfromcart.php?remove=<?= sanitize($item['id']) ?>"><?= sanitize(translate('Remove item')) ?></a></td>
@@ -34,7 +40,16 @@ include "header.php";
         <?php endwhile; ?>
         </tbody>
     </table>
+    <hr/>
+    <form action="sendmail.php" method="POST">
+        <p><?= sanitize(translate('Send an email')) ?></p> <br/>
+        <input type="text" name="name" placeholder="Full name" required /> <br/><br/>
+        <input type="email" name="mail" placeholder="Your email" required /> <br/><br/>
+        <input type="text" name="subject" placeholder="Subject" required /> <br/><br/>
+        <textarea name="message" placeholder="Comments"></textarea> <br/><br/>
+        <a href="index.php"><?= sanitize(translate('Go to index')) ?></a>
+        <button type="submit" name="submit"><?= sanitize(translate('Checkout')) ?></button>
+    </form>
 </body>
-
 
 <?php include "footer.php" ?>

@@ -2,12 +2,10 @@
 
 include "common.php";
 
-if (isset($_GET['remove']) && !empty($_GET['remove'])) {
-    $id = $_GET['remove'];
-    foreach ($_SESSION['cart'] as $key => $value) {
-        if($key == $id) {
-            unset($_SESSION['cart'][$key]);
-        }
+if (isset($_GET['remove'])) {
+    $key = array_search($_GET['remove'], $_SESSION['cart']);
+    if (is_numeric($key)) {
+        unset($_SESSION['cart'][$key]);
     }
 }
 
