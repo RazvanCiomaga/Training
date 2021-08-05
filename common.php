@@ -9,14 +9,14 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
-require_once "config.php";
+require_once 'config.php';
 
 /**
  * Connect to database
  */
 $connectDb = mysqli_connect(serverName,username,password,dbName );
 if (!$connectDb) {
-    die("Connection failed: " . mysqli_connect_error());
+    die('Connection failed: ' . mysqli_connect_error());
 }
 
 /**
