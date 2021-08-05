@@ -15,19 +15,24 @@ include "header.php";
         </thead>
         <tbody>
         <?php
-            $select ="SELECT * FROM products WHERE id IN (".($_SESSION['cart'] ? implode(",", $_SESSION['cart']) : '0').")";
-            $result = mysqli_query($connectDb, $select);
+            $param = $_SESSION['cart'] ? str_repeat("?,", count($_SESSION['cart']) - 1) . '?' : '0';
+            $select ="SELECT * FROM products WHERE id IN ($param)";
+            $stmt = mysqli_prepare($connectDb, $select);
+            $types = str_repeat('s', count($_SESSION['cart']));
+            mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
         ?>
         <?php while ($item= mysqli_fetch_array($result)) : ?>
             <tr>
                 <td><p><?= sanitize($item["id"]) ?></p></td>
+                <td><img src="<?= sanitize($item["image"]); ?>" class="img" /></td>
                 <td><p><?= sanitize($item["title"]) ?></p></td>
                 <td><p><?= sanitize($item["price"]) ?></p></td>
                 <td><a href="rmvfromcart.php?remove=<?= sanitize($item['id']) ?>"><?= sanitize(translate('Remove item')) ?></a></td>
             </tr>
         <?php endwhile; ?>
         </tbody>
-
     </table>
 </body>
 

@@ -5,9 +5,11 @@
  */
 session_start();
 
+
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
+$param = $_SESSION['cart'] ? implode(",", $_SESSION['cart']) : '0';
 
 require_once "config.php";
 

@@ -7,16 +7,19 @@ if (isset($_SESSION['cart']) && isset($_GET['id'])) {
 }
 
 include "header.php";
-
-
 ?>
 
 <body>
     <h1><?= sanitize(translate("Products Page")) ?></h1>
     <div class="container">
         <?php
-            $select ="SELECT * FROM products WHERE id NOT IN(".($_SESSION['cart'] ? implode(",", $_SESSION['cart']) : '0').")";
-            $result = mysqli_query($connectDb, $select);
+            $param = $_SESSION['cart'] ? str_repeat("?,", count($_SESSION['cart']) - 1) . '?' : '0';
+            $select ="SELECT * FROM products WHERE id NOT IN ($param)";
+            $stmt = mysqli_prepare($connectDb, $select);
+            $types = str_repeat('s', count($_SESSION['cart']));
+            mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
         ?>
         <table border="1">
             <thead>
