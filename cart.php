@@ -28,10 +28,11 @@ include 'header.php';
         <tbody>
         <?php
             $param = $_SESSION['cart'] ? str_repeat('?,', count($_SESSION['cart']) - 1) . '?' : '0';
-            $select ='SELECT * FROM products WHERE id IN ($param)';
+            $select ="SELECT * FROM products WHERE id IN ($param)";
 
             $stmt = mysqli_prepare($connectDb, $select);
             $types = str_repeat('s', count($_SESSION['cart']));
+
             if (!empty($_SESSION['cart'])) {
                 mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
             }

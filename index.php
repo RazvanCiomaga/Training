@@ -18,14 +18,13 @@ include 'header.php';
     <div class='container'>
         <?php
             $param = $_SESSION['cart'] ? str_repeat('?,', count($_SESSION['cart']) - 1) . '?' : '0';
-            $select ='SELECT * FROM products WHERE id NOT IN ($param)';
+            $select ="SELECT * FROM products WHERE id NOT IN ($param)";
 
             $stmt = mysqli_prepare($connectDb, $select);
             $types = str_repeat('s', count($_SESSION['cart']));
             if (!empty($_SESSION['cart'])) {
                 mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
             }
-
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
         ?>
