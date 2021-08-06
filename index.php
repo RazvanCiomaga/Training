@@ -1,5 +1,4 @@
 <?php
-
 include 'common.php';
 
 if (isset($_SESSION['cart']) && isset($_GET['id'])) {
@@ -25,13 +24,13 @@ include 'header.php';
             if (!empty($_SESSION['cart'])) {
                 mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
             }
+
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
         ?>
         <table border='1'>
             <thead>
                 <tr>
-                    <th><?= sanitize(translate('ID')) ?></th>
                     <th><?= sanitize(translate('Image')) ?></th>
                     <th><?= sanitize(translate('Title')) ?></th>
                     <th><?= sanitize(translate('Description')) ?></th>
@@ -42,7 +41,6 @@ include 'header.php';
             <tbody>
             <?php while ($row = mysqli_fetch_array($result)) : ?>
                 <tr>
-                    <td><p><?= sanitize($row['id']) ?></p></td>
                     <td><img src='<?= sanitize($row['image']); ?>' class='img' /></td>
                     <td><h2><?= sanitize($row['title']) ?></h2></td>
                     <td><p><?= sanitize($row['description']) ?></p></td>
@@ -54,7 +52,6 @@ include 'header.php';
         </table>
     </div>
 </body>
-
 <?php include 'footer.php' ?>
 
 
