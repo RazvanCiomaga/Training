@@ -5,6 +5,9 @@
  */
 session_start();
 
+/**
+ * creating session cart array
+ */
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
