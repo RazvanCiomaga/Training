@@ -31,21 +31,17 @@ if (!$_SESSION['login']) {
                 mysqli_stmt_execute($stmt);
 
                 mysqli_stmt_close($stmt);
-            } /**
-             * Update
-             */
-                else if (isset($_POST['update'])) {
-                    $updateProduct = "UPDATE products SET title = ? , image = ? , price = ? WHERE id = ?";
-                    $stmt = mysqli_prepare($connectDb, $updateProduct);
+            } else if (isset($_POST['update'])) {
+                $updateProduct = "UPDATE products SET title = ? , image = ? , price = ? WHERE id = ?";
+                $stmt = mysqli_prepare($connectDb, $updateProduct);
 
-                    mysqli_stmt_bind_param($stmt, 'ssss', $productTitle, $productImage, $productPrice, $updatedProduct);
+                mysqli_stmt_bind_param($stmt, 'ssss', $productTitle, $productImage, $productPrice, $_GET['update']);
 
-                    mysqli_stmt_execute($stmt);
+                mysqli_stmt_execute($stmt);
 
-                    die(mysqli_stmt_error($stmt));
+                mysqli_stmt_close($stmt);
+            }
 
-                    mysqli_stmt_close($stmt);
-                }
             header('Location: products.php');
         }  else {
             $productErr = translate('All fields are required and price must be numeric.');
@@ -57,7 +53,7 @@ require_once 'header.php';
 ?>
 <body>
     <h1><?= sanitize(translate('Add product details')) ?></h1>
-    <form action="product.php" method="POST">
+    <form action="product.php?update=<?= $_GET['update']; ?>" method="POST">
         <label for="title"><?= sanitize(translate('Product Title:')) ?></label><br/>
         <input type="text" name="title" id="title" /><br/><br/>
 
