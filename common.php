@@ -1,5 +1,10 @@
 <?php
 
+/***
+ * Setting up an page title
+ */
+$pageTitle = '';
+
 /**
  * Starting a working session
  */
@@ -11,6 +16,14 @@ session_start();
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
+
+/***
+ * create a variable to check if customer is logged in
+ */
+if(!isset($_SESSION['login'])) {
+    $_SESSION['login'] = false;
+}
+
 
 require_once 'config.php';
 
