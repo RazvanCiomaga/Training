@@ -1,7 +1,7 @@
 <?php
 include 'common.php';
 
-$pageTitle = 'Index';
+$pageTitle = translate('Index');
 
 if (isset($_SESSION['cart']) && isset($_GET['id'])) {
     if (!in_array($_GET['id'], $_SESSION['cart'])) {
@@ -12,25 +12,28 @@ if (isset($_SESSION['cart']) && isset($_GET['id'])) {
     die;
 }
 
+/**
+ * Select products that are not in cart
+ */
+$param = $_SESSION['cart'] ? str_repeat('?,', count($_SESSION['cart']) - 1) . '?' : '0';
+$select = "SELECT * FROM products WHERE id NOT IN ($param)";
+
+$stmt = mysqli_prepare($connectDb, $select);
+$types = str_repeat('s', count($_SESSION['cart']));
+if (!empty($_SESSION['cart'])) {
+    mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
+}
+
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+mysqli_stmt_close($stmt);
+
+
 include 'header.php';
 ?>
 <body>
-    <?php if ($_SESSION['login']): ?>
-        <h1><?= sanitize(translate('Products Page')) ?></h1>
+    <h1><?= sanitize(translate('Products Page')) ?></h1>
         <div class='container'>
-            <?php
-                $param = $_SESSION['cart'] ? str_repeat('?,', count($_SESSION['cart']) - 1) . '?' : '0';
-                $select ="SELECT * FROM products WHERE id NOT IN ($param)";
-
-                $stmt = mysqli_prepare($connectDb, $select);
-                $types = str_repeat('s', count($_SESSION['cart']));
-                if (!empty($_SESSION['cart'])) {
-                    mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
-                }
-
-                mysqli_stmt_execute($stmt);
-                $result = mysqli_stmt_get_result($stmt);
-            ?>
             <table border='1'>
                 <thead>
                     <tr>
@@ -54,11 +57,6 @@ include 'header.php';
                 </tbody>
             </table>
         </div>
-    <?php
-        else:
-            header('Location: login.php');
-        endif;
-    ?>
 </body>
 <?php include 'footer.php' ?>
 

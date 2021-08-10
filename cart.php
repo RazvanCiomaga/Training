@@ -2,7 +2,7 @@
 
 include 'common.php';
 
-$pageTitle = 'Cart';
+$pageTitle = translate('Cart');
 
 if (isset($_GET['remove'])) {
     $key = array_search($_GET['remove'], $_SESSION['cart']);
@@ -26,8 +26,15 @@ if (isset($_POST['submit'])) {
     $checkMail = filter_var($customerMail,FILTER_VALIDATE_EMAIL);
     $checkName = preg_match("/^[a-zA-Z-' ]*$/", $customerName);
 
+    /**
+     * Check if form is completed correctly
+     * Create error messages if not
+     */
     if ($checkMail && $checkName && !empty($mailContent)) {
         if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
+            /***
+             * Select products that are in cart
+             */
             $param = $_SESSION['cart'] ? str_repeat('?,', count($_SESSION['cart']) - 1) . '?' : '0';
             $select ="SELECT * FROM products WHERE id IN ($param)";
 
@@ -39,16 +46,35 @@ if (isset($_POST['submit'])) {
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
 
-            $insertOrder = "INSERT INTO `order` (total_price, name , email) VALUES (".$_SESSION['totalPrice'].", '$customerName', '$customerMail')";
-            if (mysqli_query($connectDb, $insertOrder)) {
+            /**
+             * Insert order details
+             */
+            $insertOrder = "INSERT INTO `order` (total_price, name, email) VALUES (?, ?, ?)";
+
+            $stmt = mysqli_prepare($connectDb, $insertOrder);
+
+            mysqli_stmt_bind_param($stmt, 'sss', $_SESSION['totalPrice'], $customerName, $customerMail);
+
+            if (mysqli_stmt_execute($stmt)) {
                 $lastId = mysqli_insert_id($connectDb);
             }
 
+            /**
+             * Insert product and order ids in order_product tabel
+             */
             while ($item = mysqli_fetch_array($result)) {
-                $orderProduct = "INSERT INTO `order_product` (order_id, product_id) VALUES ('$lastId', ".$item['id'].")";
-                mysqli_query($connectDb, $orderProduct);
+                $orderProduct = "INSERT INTO `order_product` (order_id, product_id) VALUES (?, ?)";
+
+                $statment = mysqli_prepare($connectDb, $orderProduct);
+
+                mysqli_stmt_bind_param($statment, 'ss', $lastId, $item['id']);
+
+                mysqli_stmt_execute($statment);
             }
 
+            /**
+             * Create mail content
+             */
             $txt = "<html>
                     <head>
                         <title><?= translate(Products added to cart) >?</title>
@@ -67,10 +93,12 @@ if (isset($_POST['submit'])) {
                             <tbody> ";
 
             while ($item = mysqli_fetch_array($result)) {
-                $txt .= "<td><img src='".sanitize($item['image'])."' class='img' alt=''/></td>
-                                 <td><p>".sanitize($item['title'])."</p></td>
-                                 <td><p>".sanitize($item['description'])."</p></td>
-                                 <td><p>".sanitize($item['price'])."</p></td> ";
+                $txt .= "   <tr>
+                                <td><img src='".sanitize($item['image'])."' class='img' alt=''/></td>
+                                <td><p>".sanitize($item['title'])."</p></td>
+                                <td><p>".sanitize($item['description'])."</p></td>
+                                <td><p>".sanitize($item['price'])."</p></td> 
+                            </tr>";
             }
 
             $txt .= "       </tbody>
@@ -86,29 +114,49 @@ if (isset($_POST['submit'])) {
         $headers .= "From: ".$customerMail;
         $txt .= "\n"."You have received an email from ".$customerName.".\n\n".$mailContent;
 
-        mail(shopManager, $subject, $txt, $headers);
+        /**
+         * Send mail
+         */
+        mail(Shop_Manager, $subject, $txt, $headers);
         header("Location: cart.php");
-    }
+    } else {
+        if (!$checkName || empty($customerName)) {
+            $nameError = translate("Required field!Only letters and white space allowed.");
+        }
 
-    if (!$checkName || empty($customerName)) {
-        $nameError = "Required field!Only letters and white space allowed.";
-    }
+        if (!$checkMail) {
+            $mailError = translate('Please enter an valid mail!') ;
+        }
 
-    if (!$checkMail) {
-        $mailError = 'Please enter an valid mail!' ;
-    }
-
-    if (empty($mailContent)) {
-        $contentError = 'Please enter an message!';
+        if (empty($mailContent)) {
+            $contentError = translate('Please enter an message!');
+        }
     }
 }
 
+/**
+ * Select products that are in cart
+ */
+$_SESSION['totalPrice'] = 0;
+
+$param = $_SESSION['cart'] ? str_repeat('?,', count($_SESSION['cart']) - 1) . '?' : '0';
+$select = "SELECT * FROM products WHERE id IN ($param)";
+
+$stmt = mysqli_prepare($connectDb, $select);
+$types = str_repeat('s', count($_SESSION['cart']));
+
+if (!empty($_SESSION['cart'])) {
+    mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
+}
+
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+mysqli_stmt_close($stmt);
 
 include 'header.php';
 ?>
 <body>
     <h1><?= sanitize(translate('Products in cart')) ?></h1>
-    <?php if ($_SESSION['login']): ?>
         <form action='cart.php' method='POST'>
             <table border='1'>
                 <thead>
@@ -121,22 +169,7 @@ include 'header.php';
                 </tr>
                 </thead>
                 <tbody>
-                <?php
-                    $_SESSION['totalPrice'] = 0;
 
-                    $param = $_SESSION['cart'] ? str_repeat('?,', count($_SESSION['cart']) - 1) . '?' : '0';
-                    $select ="SELECT * FROM products WHERE id IN ($param)";
-
-                    $stmt = mysqli_prepare($connectDb, $select);
-                    $types = str_repeat('s', count($_SESSION['cart']));
-
-                    if (!empty($_SESSION['cart'])) {
-                        mysqli_stmt_bind_param($stmt, $types, ...$_SESSION['cart']);
-                    }
-
-                    mysqli_stmt_execute($stmt);
-                    $result = mysqli_stmt_get_result($stmt);
-                ?>
                 <?php while ($item = mysqli_fetch_array($result)) : ?>
                     <?php $_SESSION['totalPrice'] += (float)$item['price']; ?>
                     <tr>
@@ -151,26 +184,27 @@ include 'header.php';
             </table>
             <hr/>
             <h2><?= sanitize(translate('Send an email')) ?></h2> <br/>
+
             <input type='text' name='name' placeholder='Full name' /> <br/>
             <?php if(!empty($nameError)) : ?>
                 <p style="color: red;"><?= $nameError ?></p>
             <?php endif; ?><br/>
+
             <input type='email' name='mail' placeholder='Your email' /> <br/>
             <?php if(!empty($mailError)) : ?>
                 <p style="color: red;"><?= $mailError ?></p>
             <?php endif; ?><br/>
+
             <input type='text' name='subject' placeholder='Subject' /> <br/><br/>
+
             <textarea name='message' placeholder='Comments'></textarea>
             <?php if(!empty($contentError)) : ?>
                 <p style="color: red;"><?= $contentError?></p>
             <?php endif; ?><br/>
+
             <a href='index.php'><?= sanitize(translate('Go to index')) ?></a>
+
             <button type='submit' name='submit'><?= sanitize(translate('Checkout')) ?></button>
         </form>
-    <?php
-        else:
-            header('Location: login.php');
-        endif;
-    ?>
 </body>
 <?php include 'footer.php' ?>

@@ -30,7 +30,7 @@ require_once 'config.php';
 /**
  * Connect to database
  */
-$connectDb = mysqli_connect(serverName,username,password,dbName );
+$connectDb = mysqli_connect(Server_Name, Username, Password, Database_Name);
 if (!$connectDb) {
     die('Connection failed: ' . mysqli_connect_error());
 }
