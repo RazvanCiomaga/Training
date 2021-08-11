@@ -65,6 +65,7 @@ require_once 'header.php';
             <td><?= sanitize($details['total_price']) ?></td>
         </tr>
         <?php endforeach;?>
+
         </tbody>
     </table><br/>
     <a href='orders.php'><?= sanitize(translate('Go to orders')) ?></a>
