@@ -2,37 +2,33 @@
 
 require_once 'common.php';
 
-if (!$_SESSION['login']) {
-    header('Location: login.php');
-    die;
-} else {
-    $pageTitle = 'Products';
+checkLogin();
 
-    /**
-     * Delete product from tabel
-     */
-    if (isset($_GET['delete'])) {
-        $delete = "DELETE FROM `products` WHERE id = ?";
-        $stmt = mysqli_prepare($connectDb, $delete);
+$pageTitle = translate('Products');
 
-        mysqli_stmt_bind_param($stmt, 's', $_GET['delete']);
+/**
+ * Delete product from tabel
+ */
+if (isset($_GET['delete'])) {
+    $delete = "DELETE FROM `products` WHERE id = ?";
+    $stmt = mysqli_prepare($connectDb, $delete);
 
-        mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
+    mysqli_stmt_bind_param($stmt, 's', $_GET['delete']);
 
-        header('Location: products.php');
-    }
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
 
-    /**
-     * Select all products from products tabel
-     */
-    $selectProducts = 'SELECT id,title,image,price FROM products ';
-    $result = mysqli_query($connectDb, $selectProducts);
+    header('Location: products.php');
 }
+
+/**
+ * Select all products from products tabel
+ */
+$selectProducts = 'SELECT id,title,image,price FROM products ';
+$result = mysqli_query($connectDb, $selectProducts);
 
 require_once 'header.php';
 ?>
-<body>
     <form action='product.php' method='POST'>
         <h1><?= sanitize(translate('All Products')) ?></h1>
             <table border="1">
@@ -59,5 +55,4 @@ require_once 'header.php';
             </table><br/>
         <button type="submit" name="addProduct"><?= sanitize(translate('Add Product')) ?></button>
     </form>
-</body>
 <?php require_once 'footer.php'; ?>

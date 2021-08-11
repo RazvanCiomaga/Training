@@ -28,10 +28,8 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 mysqli_stmt_close($stmt);
 
-
 include 'header.php';
 ?>
-<body>
     <h1><?= sanitize(translate('Products Page')) ?></h1>
         <div class='container'>
             <table border='1'>

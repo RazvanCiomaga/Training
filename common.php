@@ -24,6 +24,17 @@ if(!isset($_SESSION['login'])) {
     $_SESSION['login'] = false;
 }
 
+/**
+ * Function that check if user is logged in
+ */
+function checkLogin() {
+    if (!$_SESSION['login']) {
+        header('Location: login.php');
+        die;
+    }
+}
+
+
 
 require_once 'config.php';
 
@@ -58,5 +69,6 @@ function translate($text) {
 function sanitize($string) {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
+
 
 

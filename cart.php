@@ -155,7 +155,6 @@ mysqli_stmt_close($stmt);
 
 include 'header.php';
 ?>
-<body>
     <h1><?= sanitize(translate('Products in cart')) ?></h1>
         <form action='cart.php' method='POST'>
             <table border='1'>
@@ -206,5 +205,4 @@ include 'header.php';
 
             <button type='submit' name='submit'><?= sanitize(translate('Checkout')) ?></button>
         </form>
-</body>
 <?php include 'footer.php' ?>

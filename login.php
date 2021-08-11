@@ -7,6 +7,7 @@ $pageTitle = translate('Log In');
 
 if (isset($_POST['login'])) {
     $loginErr = '';
+
     /**
      * Check if user is valid
      * If not creating an error message
@@ -20,7 +21,6 @@ if (isset($_POST['login'])) {
 
 require_once 'header.php';
 ?>
-<body>
     <h1><?= sanitize(translate('Log In Here')) ?></h1>
     <form method="POST" action="login.php">
         <label for="user"><?= sanitize(translate('Username:')) ?></label><br/>
@@ -36,5 +36,4 @@ require_once 'header.php';
 
         <a href="products.php"><?= sanitize(translate('Go to products')) ?></a>
     </form>
-</body>
 <?php require_once 'footer.php'; ?>
