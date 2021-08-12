@@ -17,6 +17,14 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
+/**
+ * Create images array
+ */
+if (!isset($_SESSION['images'])) {
+    $_SESSION['images'] = [];
+}
+
+
 /***
  * create a variable to check if customer is logged in
  */
@@ -33,8 +41,6 @@ function checkLogin() {
         die;
     }
 }
-
-
 
 require_once 'config.php';
 

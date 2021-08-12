@@ -2,9 +2,32 @@
 
 require_once 'common.php';
 
+if (isset($_POST['login'])) {
+    $_SESSION['loginErr']= '';
+
+    /**
+     * Check if user is valid
+     * If not creating an error message
+     */
+    if ($_POST['username'] === Customer_Username && $_POST['password'] === Customer_Password) {
+        $_SESSION['login'] = true;
+    } else {
+        $_SESSION['loginErr'] = translate('Invalid username or password');
+    }
+}
+
 checkLogin();
 
 $pageTitle = translate('Products');
+
+/**
+ * Set image array
+ */
+$select = 'SELECT * FROM `products` ';
+$query = mysqli_query($connectDb, $select);
+while ($imagePath = mysqli_fetch_array($query)) {
+    $_SESSION['images'][] = $imagePath['image'];
+}
 
 /**
  * Delete product from tabel
@@ -19,6 +42,15 @@ if (isset($_GET['delete'])) {
     mysqli_stmt_close($stmt);
 
     header('Location: products.php');
+}
+
+$select = 'SELECT * FROM `products` ';
+$query = mysqli_query($connectDb, $select);
+while ($imagePath = mysqli_fetch_array($query)) {
+    $key = array_search($imagePath['image'], $_SESSION['images']);
+    if ($key !== false) {
+        unset($_SESSION['images'][$key]);
+    }
 }
 
 /**
