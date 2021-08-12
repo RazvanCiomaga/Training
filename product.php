@@ -12,10 +12,13 @@ if (isset($_POST['add']) || isset($_POST['update']) ){
     $priceErr = '';
     $numericErr = '';
     $imageExist = '';
+    $extensionErr = '';
 
     $imageName = $_FILES['image']['name'];
     $imageTmpName = $_FILES['image']['tmp_name'];
-    $imageFolder = "images/".$imageName;
+    $imageFolder = "images/";
+    $imageExtension = pathinfo($imageName, PATHINFO_EXTENSION);
+    $extension = ['jpg','jpeg','png'];
 
     $productTitle = $_POST['title'];
     $productPrice = $_POST['price'];
@@ -24,19 +27,18 @@ if (isset($_POST['add']) || isset($_POST['update']) ){
      * Validate form and inserting/updating new product in products table if it's valid
      * Create an error message if not
      */
-    if (!empty($productTitle) && !empty($imageName) && !empty($productPrice) && is_numeric($productPrice) && !in_array($imageFolder, $_SESSION['images'])) {
-        move_uploaded_file($imageTmpName, $imageFolder);
+    if (!empty($productTitle) && !empty($imageName) && !empty($productPrice) && is_numeric($productPrice) && in_array($imageExtension, $extension)) {
+        $insertedImage = $imageFolder.$imageName;
 
-        /**
-         * Insert
-         */
         if (isset($_POST['add'])) {
             $insertProduct = "INSERT INTO products (title,image,price) VALUES (?, ?, ?)";
             $stmt = mysqli_prepare($connectDb, $insertProduct);
 
-            mysqli_stmt_bind_param($stmt, 'sss', $productTitle, $imageFolder, $productPrice);
+            mysqli_stmt_bind_param($stmt, 'sss', $productTitle, $insertedImage, $productPrice);
 
-            mysqli_stmt_execute($stmt);
+            if (mysqli_stmt_execute($stmt)) {
+                $lastId = mysqli_insert_id($connectDb);
+            }
 
             mysqli_stmt_close($stmt);
 
@@ -44,12 +46,29 @@ if (isset($_POST['add']) || isset($_POST['update']) ){
             $updateProduct = "UPDATE products SET title = ? , image = ? , price = ? WHERE id = ?";
             $stmt = mysqli_prepare($connectDb, $updateProduct);
 
-            mysqli_stmt_bind_param($stmt, 'ssss', $productTitle, $imageFolder, $productPrice, $_GET['update']);
+            $lastId = $_GET['update'];
+
+            mysqli_stmt_bind_param($stmt, 'ssss', $productTitle, $insertedImage, $productPrice, $_GET['update']);
 
             mysqli_stmt_execute($stmt);
 
             mysqli_stmt_close($stmt);
         }
+
+        /**
+         * Set image name same as product id
+         */
+        $query = 'UPDATE `products` SET image = ? WHERE id = ?';
+        $stmt = mysqli_prepare($connectDb, $query);
+
+        $newName = 'images/'.$lastId.'.'.$imageExtension;
+        move_uploaded_file($imageTmpName, $newName);
+
+        mysqli_stmt_bind_param($stmt, 'ss', $newName, $lastId);
+
+        mysqli_stmt_execute($stmt) or die(mysqli_stmt_error($stmt));
+
+        mysqli_stmt_close($stmt);
 
         header('Location: products.php');
 
@@ -69,8 +88,9 @@ if (isset($_POST['add']) || isset($_POST['update']) ){
         if (!is_numeric($productPrice)) {
             $numericErr = translate('Price must be numeric');
         }
-        if (in_array($imageFolder, $_SESSION['images'])) {
-            $imageExist = translate('Image already exists ');
+
+        if (!in_array($imageExtension, $extension)) {
+            $extensionErr = translate('File extension must be .jpg, .jpeg or .png');
         }
     }
 }
@@ -94,6 +114,10 @@ require_once 'header.php';
 
         <?php if(!empty($imageExist)): ?>
             <p style="color: red;"><?= sanitize($imageExist) ?></p>
+        <?php endif; ?><br/>
+
+        <?php if(!empty($extensionErr)): ?>
+            <p style="color: red;"><?= sanitize($extensionErr) ?></p>
         <?php endif; ?><br/>
 
         <label for="price"><?= sanitize(translate('Product Price:')) ?></label><br/>

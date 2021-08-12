@@ -21,16 +21,7 @@ checkLogin();
 $pageTitle = translate('Products');
 
 /**
- * Set image array
- */
-$select = 'SELECT * FROM `products` ';
-$query = mysqli_query($connectDb, $select);
-while ($imagePath = mysqli_fetch_array($query)) {
-    $_SESSION['images'][] = $imagePath['image'];
-}
-
-/**
- * Delete product from tabel
+ * Delete product from table and unset image from images array
  */
 if (isset($_GET['delete'])) {
     $delete = "DELETE FROM `products` WHERE id = ?";
@@ -44,17 +35,8 @@ if (isset($_GET['delete'])) {
     header('Location: products.php');
 }
 
-$select = 'SELECT * FROM `products` ';
-$query = mysqli_query($connectDb, $select);
-while ($imagePath = mysqli_fetch_array($query)) {
-    $key = array_search($imagePath['image'], $_SESSION['images']);
-    if ($key !== false) {
-        unset($_SESSION['images'][$key]);
-    }
-}
-
 /**
- * Select all products from products tabel
+ * Select all products from products table
  */
 $selectProducts = 'SELECT id,title,image,price FROM products ';
 $result = mysqli_query($connectDb, $selectProducts);
