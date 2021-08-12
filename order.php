@@ -3,30 +3,19 @@
 require_once 'common.php';
 
 /**
- * Select ordered products
+ * Select ordered products and order details
  */
-$order = 'SELECT products.title,products.image,products.price FROM `products`  
-          JOIN `order_product` ON products.id = order_product.product_id WHERE order_product.order_id = ?
-        ';
+$order = 'SELECT products.title,products.image,products.price,order.order_id,order.name,order.email,order.total_price FROM `products`  
+          JOIN `order_product` ON products.id = order_product.product_id 
+          JOIN `order` ON order.order_id = order_product.order_id
+          WHERE order_product.order_id = ? AND order.order_id = ?';
+
 $stmt = mysqli_prepare($connectDb, $order);
 
-mysqli_stmt_bind_param($stmt , 's', $_GET['id']);
+mysqli_stmt_bind_param($stmt , 'ss', $_GET['id'], $_GET['id']);
 
 mysqli_stmt_execute($stmt) or die(mysqli_stmt_error($stmt));
 $product = mysqli_stmt_get_result($stmt);
-
-mysqli_stmt_close($stmt);
-
-/**
- * Select order details from order table where order_id = $_GET['id']
- */
-$details = 'SELECT * FROM `order` WHERE order_id = ?';
-$stmt = mysqli_prepare($connectDb, $details);
-
-mysqli_stmt_bind_param($stmt , 's', $_GET['id']);
-
-mysqli_stmt_execute($stmt);
-$orderDetails = mysqli_stmt_get_result($stmt);
 
 mysqli_stmt_close($stmt);
 
@@ -57,14 +46,17 @@ require_once 'header.php';
             <td><h3><?= sanitize(translate('Customer Email')) ?></h3></td>
         </tr>
         <!--- Display order details --->
-        <?php foreach($orderDetails as $details): ?>
+       <?php foreach($product as $details): ?>
         <tr>
             <td><?= sanitize($details['order_id']) ?></td>
             <td><?= sanitize($details['name']) ?></td>
             <td><?= sanitize($details['email']) ?></td>
             <td><?= sanitize($details['total_price']) ?></td>
         </tr>
-        <?php endforeach;?>
+       <?php
+            break;
+            endforeach;
+       ?>
 
         </tbody>
     </table><br/>
