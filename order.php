@@ -53,11 +53,11 @@ require_once 'header.php';
                 <td><p><?= sanitize($item['price']) ?></p></td>
             </tr>
         <?php endwhile; ?>
-        <tr>
-            <td><h3><?= sanitize(translate('Order ID')) ?></h3></td>
-            <td><h3><?= sanitize(translate('Customer Name')) ?></h3></td>
-            <td><h3><?= sanitize(translate('Customer Email')) ?></h3></td>
-        </tr>
+            <tr>
+                <td><h3><?= sanitize(translate('Order ID')) ?></h3></td>
+                <td><h3><?= sanitize(translate('Customer Name')) ?></h3></td>
+                <td><h3><?= sanitize(translate('Customer Email')) ?></h3></td>
+            </tr>
         <!--- Display order details --->
         <?php foreach($orderDetails as $details): ?>
             <tr>

@@ -37,7 +37,6 @@ include 'header.php';
                     <tr>
                         <th><?= sanitize(translate('Image')) ?></th>
                         <th><?= sanitize(translate('Title')) ?></th>
-                        <th><?= sanitize(translate('Description')) ?></th>
                         <th><?= sanitize(translate('Price')) ?></th>
                         <th><?= sanitize(translate('Add to cart')) ?></th>
                     </tr>
@@ -47,7 +46,6 @@ include 'header.php';
                     <tr>
                         <td><img src='<?= sanitize($row['image']); ?>' class='img' /></td>
                         <td><h2><?= sanitize($row['title']) ?></h2></td>
-                        <td><p><?= sanitize($row['description']) ?></p></td>
                         <td><h4><?= sanitize($row['price']) ?></h4></td>
                         <td><a href='index.php?id=<?= sanitize($row['id']) ?>'><?= sanitize(translate('Add to Cart')) ?></a></td>
                     </tr>

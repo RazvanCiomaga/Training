@@ -85,7 +85,6 @@ if (isset($_POST['submit'])) {
                             <tr>
                                 <th><?= sanitize(translate('Image')) ?></th>
                                 <th><?= sanitize(translate('Title')) ?></th>
-                                <th><?= sanitize(translate('Description')) ?></th>
                                 <th><?= sanitize(translate('Price')) ?></th>
                                 <th><?= sanitize(translate('Remove')) ?></th>
                             </tr>
@@ -96,7 +95,6 @@ if (isset($_POST['submit'])) {
                 $txt .= "   <tr>
                                 <td><img src='".sanitize($item['image'])."' class='img' alt=''/></td>
                                 <td><p>".sanitize($item['title'])."</p></td>
-                                <td><p>".sanitize($item['description'])."</p></td>
                                 <td><p>".sanitize($item['price'])."</p></td> 
                             </tr>";
             }
